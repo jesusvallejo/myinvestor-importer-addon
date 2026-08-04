@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.3] - 2026-08-04
+
+### Added
+
+- Added support for personal current-account movimientos rows found in real exports, including:
+	- `BIZUM ENVIADO` -> `WITHDRAWAL`
+	- `BIZUM RECIBIDO` -> `DEPOSIT`
+	- `COMPRA COMERCIO O/L` (card purchase) -> `WITHDRAWAL`
+	- `COMPRA RV CONTADO` (no `SF` suffix variant) -> `BUY`
+	- `TRANSF INMEDIATA EMITIDA` -> `WITHDRAWAL`
+
 ## [1.0.2] - 2026-07-23
 
 ### Added

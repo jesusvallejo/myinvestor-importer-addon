@@ -342,11 +342,12 @@ export function transform(
 
     if (
       r.tipo === "COMPRA RV CONTADO SF" ||
+      r.tipo === "COMPRA RV CONTADO" ||
       r.tipo === "VENTA DE VALORES" ||
       r.tipo === "COMPRA RF VCTO" ||
       r.tipo === "AMORTIZACION RF"
     ) {
-      const isBuy = r.tipo === "COMPRA RV CONTADO SF" || r.tipo === "COMPRA RF VCTO";
+      const isBuy = r.tipo === "COMPRA RV CONTADO SF" || r.tipo === "COMPRA RV CONTADO" || r.tipo === "COMPRA RF VCTO";
       const instrumentType = r.tipo.includes("RF") ? "BOND" : "STOCK";
       const { symbol, quantity } = conceptInstrument(r.concepto);
       if (quantity == null || quantity === 0) {
@@ -396,7 +397,7 @@ export function transform(
       continue;
     }
 
-    if (r.tipo === "TRANSFERENCIA SEPA" || r.tipo === "TRANSFERENCIA INMEDIATA") {
+    if (r.tipo === "TRANSFERENCIA SEPA" || r.tipo === "TRANSFERENCIA INMEDIATA" || r.tipo === "TRANSF INMEDIATA EMITIDA") {
       // A bank transfer in is often also recorded as a TRANSFER_IN by
       // whichever addon manages the source account (e.g.
       // trade-republic-importer-addon's Transfer Patterns) — importing it
@@ -433,6 +434,18 @@ export function transform(
       drafts.push(
         cashAct(accountId, amt >= 0 ? "DEPOSIT" : "WITHDRAWAL", r.fechaOperacion, orderHint, absAmt, r.concepto || r.tipo),
       );
+      continue;
+    }
+
+    // Bizum (P2P) and card purchases are plain personal cash movements, same
+    // as any other current-account transaction — just DEPOSIT/WITHDRAWAL.
+    if (r.tipo === "BIZUM ENVIADO" || r.tipo === "COMPRA COMERCIO O/L") {
+      drafts.push(cashAct(accountId, "WITHDRAWAL", r.fechaOperacion, orderHint, absAmt, r.concepto || r.tipo));
+      continue;
+    }
+
+    if (r.tipo === "BIZUM RECIBIDO") {
+      drafts.push(cashAct(accountId, "DEPOSIT", r.fechaOperacion, orderHint, absAmt, r.concepto || r.tipo));
       continue;
     }
 

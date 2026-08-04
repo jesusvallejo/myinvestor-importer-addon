@@ -199,6 +199,20 @@ describe("cash-only movimientos rows", () => {
     expect(activities[0].activityType).toBe("DEPOSIT");
   });
 
+  it("maps negative TRANSF INMEDIATA EMITIDA to WITHDRAWAL", () => {
+    const { activities } = transform([], [movRow({ tipo: "TRANSF INMEDIATA EMITIDA", importe: "-17,81" })], CONFIG);
+    expect(activities[0].activityType).toBe("WITHDRAWAL");
+  });
+
+  it("maps BIZUM ENVIADO and COMPRA COMERCIO O/L to WITHDRAWAL, BIZUM RECIBIDO to DEPOSIT", () => {
+    const sent = transform([], [movRow({ tipo: "BIZUM ENVIADO", importe: "-9,79", concepto: "Triccount" })], CONFIG);
+    expect(sent.activities[0].activityType).toBe("WITHDRAWAL");
+    const received = transform([], [movRow({ tipo: "BIZUM RECIBIDO", importe: "+21,00", concepto: "Sin concepto" })], CONFIG);
+    expect(received.activities[0].activityType).toBe("DEPOSIT");
+    const card = transform([], [movRow({ tipo: "COMPRA COMERCIO O/L", importe: "-3,50", concepto: "DALI" })], CONFIG);
+    expect(card.activities[0].activityType).toBe("WITHDRAWAL");
+  });
+
   it("maps ABONO POR TRASPASO to DEPOSIT and CARGO POR TRASPASO to WITHDRAWAL (untracked cartera indexada)", () => {
     const abono = transform([], [movRow({ tipo: "ABONO POR TRASPASO", importe: "+2,41", concepto: "Aportacion a mi cartera" })], CONFIG);
     expect(abono.activities[0].activityType).toBe("DEPOSIT");
@@ -232,6 +246,18 @@ describe("Inversis movimientos labels", () => {
     expect(activities[0].symbol).toBe("SAP AG");
     expect(activities[0].quantity).toBe("20");
     expect(parseFloat(String(activities[0].unitPrice))).toBeCloseTo(2642 / 20, 6);
+  });
+
+  it("maps COMPRA RV CONTADO (no SF suffix) to BUY the same way", () => {
+    const { activities } = transform(
+      [],
+      [movRow({ tipo: "COMPRA RV CONTADO", concepto: "MARVELL TECHNOLOGY INC @ 10", importe: "-1.490,14" })],
+      CONFIG,
+    );
+    expect(activities).toHaveLength(1);
+    expect(activities[0].activityType).toBe("BUY");
+    expect(activities[0].symbol).toBe("MARVELL TECHNOLOGY INC");
+    expect(activities[0].quantity).toBe("10");
   });
 
   it("maps VENTA DE VALORES to SELL using concept name/quantity", () => {
