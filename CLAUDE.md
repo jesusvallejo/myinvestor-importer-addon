@@ -14,7 +14,7 @@ pnpm bundle                # Build + create ZIP for local Wealthfolio installati
 
 ## Stack
 
-- **Runtime / package manager**: Node 24, pnpm 10 (versions pinned in `.tool-versions`)
+- **Runtime / package manager**: Node 24, pnpm 11 (versions pinned in `.tool-versions`, which is gitignored — see the CI workflow's `pnpm/action-setup` `version:` input for the source of truth)
 - **Build**: Vite 7 — outputs a single `dist/addon.js` (ES module, no zip)
 - **Tests**: Vitest 4 — `src/transform.test.ts` (pure logic) + `src/parseFiles.test.ts` (needs `happy-dom` for `DOMParser`, set via the `// @vitest-environment happy-dom` pragma at the top of that file only — `transform.test.ts` doesn't need DOM and stays on the fast default node environment) + `src/fixtures.test.ts` (end-to-end against sanitized real-export fixtures in `src/__fixtures__/`; stays on the default node environment and provides `DOMParser` from a manually-constructed `happy-dom` `Window` instead of the `@vitest-environment` pragma, because that pragma makes Vite 7/Vitest 4 externalize `node:fs`/`node:path` as browser stubs that throw at runtime — see the file for the workaround)
 - **Type checking**: `tsc --noEmit`
@@ -93,6 +93,10 @@ This retroactive check was written and shipped before the `assetSymbol` filter b
 
 - Fondos-only: traspasos/switches work fully (never needed cash data). Plain `SUSCRIPCION`/`REEMBOLSO` still import as `BUY`/`SELL` but without a verified `fxRate` (native-currency booking).
 - Movimientos-only: all cash-only activity types (fees, interest, deposits, etc.) work fully. `SUSCRIPCION IIC`/`REEMBOLSO IIC` rows are skipped (no ISIN/quantity available) and surfaced in the "Unsupported" tab for manual review — never silently dropped.
+
+## New transaction types must land in the fixtures too
+
+Whenever `transform.ts`/`parseFiles.ts` gains support for a new `tipo`/`concepto` row type (a new movimientos type, a new fondos operation, a new account-format quirk), add anonymized rows exercising it to `src/__fixtures__/sample-fondos.xls`/`sample-movimientos.xls` (fabricated ISINs/amounts/concepts, real encoding/HTML quirks — see `src/fixtures.test.ts`) in the same PR — not just a unit test. PR #3 added several new movimientos types (Inversis account variants, `BIZUM ENVIADO`/`RECIBIDO`, `COMPRA COMERCIO O/L`, `TRANSF INMEDIATA EMITIDA`, dividends, Letras del Tesoro) with only `transform.test.ts`/`parseFiles.test.ts` unit coverage and no fixture update, leaving the end-to-end suite blind to them.
 
 ## Releasing
 
