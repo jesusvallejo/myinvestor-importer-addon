@@ -313,6 +313,20 @@ export function transform(
     if (r.tipo === "ABONO DE DIVIDENDO") {
       const { symbol, quantity } = conceptInstrument(r.concepto);
       if (amt >= 0) {
+        if (quantity == null) {
+          // No "<instrument> @ <shares>" in the concept means we have no
+          // trustworthy symbol either — importing it would attach the
+          // dividend to a made-up instrument. Surface it for manual review
+          // instead, same as the BUY/SELL block below.
+          skipped.push({
+            date: r.fechaOperacion,
+            source: "movimientos",
+            type: r.tipo,
+            description: r.concepto,
+            reason: "Could not extract instrument name/quantity from concept text",
+          });
+          continue;
+        }
         drafts.push({
           day: r.fechaOperacion,
           orderHint,
@@ -322,7 +336,7 @@ export function transform(
             symbol,
             symbolName: symbol,
             instrumentType: "STOCK",
-            quantity: quantity != null ? fmtAmt(quantity) : undefined,
+            quantity: fmtAmt(quantity),
             amount: fmtAmt(absAmt),
             currency: r.divisa,
             comment: r.concepto || r.tipo,

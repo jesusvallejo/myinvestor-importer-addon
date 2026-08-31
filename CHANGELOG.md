@@ -1,33 +1,26 @@
 # Changelog
 
-## [1.0.4] - 2026-08-04
-
-### Added
-
-- Added support for personal current-account movimientos rows found in real exports, including:
-	- `BIZUM ENVIADO` -> `WITHDRAWAL`
-	- `BIZUM RECIBIDO` -> `DEPOSIT`
-	- `COMPRA COMERCIO O/L` (card purchase) -> `WITHDRAWAL`
-	- `COMPRA RV CONTADO` (no `SF` suffix variant) -> `BUY`
-	- `TRANSF INMEDIATA EMITIDA` -> `WITHDRAWAL`
-- Extended the shared anonymized fixtures (`src/__fixtures__/sample-movimientos.xls`) with rows covering every transaction type added in 1.0.3/1.0.4, asserted end-to-end in `src/fixtures.test.ts`.
-
-## [1.0.3] - 2026-07-23
+## [1.1.0] - 2026-08-31
 
 ### Added
 
 - Added support for Inversis.com movimientos operation labels found in brokerage exports, including:
-	- `COMPRA RV CONTADO SF` -> `BUY`
+	- `COMPRA RV CONTADO SF` / `COMPRA RV CONTADO` -> `BUY`
 	- `VENTA DE VALORES` -> `SELL`
-	- `COMPRA RF VCTO` -> `BUY` (`BOND`)
+	- `COMPRA RF VCTO` -> `BUY` (`BOND`, e.g. Letras del Tesoro)
 	- `AMORTIZACION RF` -> `SELL` (`BOND`)
 	- `ABONO DE DIVIDENDO` -> `DIVIDEND` for positive amounts, and `WITHDRAWAL` for negative reversal lines (e.g. `ANUL.`) to keep cash reconciliation exact.
-- Added parsing of instrument name and quantity from movimientos `Concepto` values in the format `<instrument> @ <quantity>` for stock/bond/dividend rows.
-- Added support for the alternate custody-fee label `COMISIONES CUSTODIA` -> `FEE`.
+	- `COMISIONES CUSTODIA` (alternate custody-fee label) -> `FEE`
+- Added support for personal current-account movimientos rows found in real exports:
+	- `BIZUM ENVIADO` -> `WITHDRAWAL`, `BIZUM RECIBIDO` -> `DEPOSIT`
+	- `COMPRA COMERCIO O/L` (card purchase) -> `WITHDRAWAL`
+	- `TRANSF INMEDIATA EMITIDA` -> `WITHDRAWAL`
+- Added parsing of instrument name and quantity from movimientos `Concepto` values in the format `<instrument> @ <quantity>` for stock/bond/dividend rows. A dividend row whose concept has no parseable instrument/quantity is surfaced under "Unsupported" rather than imported against a made-up symbol.
+- Extended the shared anonymized fixtures (`src/__fixtures__/sample-movimientos.xls`) with rows covering every transaction type above, asserted end-to-end in `src/fixtures.test.ts`.
 
 ### Changed
 
-- Updated test coverage for the new Inversis labels and added parser coverage for mojibake header variants such as `Tipo de operaci�n`.
+- Added parser coverage for mojibake header variants such as `Tipo de operación`.
 
 ## [1.0.2] - 2026-08-24
 

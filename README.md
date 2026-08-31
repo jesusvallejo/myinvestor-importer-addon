@@ -48,18 +48,18 @@ a smaller/less accurate picture — see below.
 | `REEMBOLSO` (fondos) + `REEMBOLSO IIC` (movimientos) | `SELL` |
 | `SUSCR.POR TRASPASO I` / `ALTA IIC SWITCH` (fondos only — no cash impact) | `BUY` at switch-day price |
 | `REEMB.POR TRASPASO I` / `BAJA IIC SWITCH` (fondos only — no cash impact) | `SELL` at switch-day price |
-| `COMPRA RV CONTADO SF` (movimientos) | `BUY` (symbol/quantity parsed from concept, EUR unit price derived from amount/quantity) |
+| `COMPRA RV CONTADO SF` / `COMPRA RV CONTADO` (movimientos) | `BUY` (symbol/quantity parsed from concept, EUR unit price derived from amount/quantity) |
 | `VENTA DE VALORES` (movimientos) | `SELL` (symbol/quantity parsed from concept, EUR unit price derived from amount/quantity) |
 | `COMPRA RF VCTO` (movimientos) | `BUY` bond |
 | `AMORTIZACION RF` (movimientos) | `SELL` bond |
-| `ABONO DE DIVIDENDO` positive | `DIVIDEND` |
+| `ABONO DE DIVIDENDO` positive | `DIVIDEND` (skipped for review if the concept has no `<instrument> @ <quantity>` to identify the security) |
 | `ABONO DE DIVIDENDO` negative (e.g. `ANUL.` reversal line) | `WITHDRAWAL` (cash correction) |
 | `COMISION CUSTODIA MYINVESTOR`, `COMISIONES CUSTODIA`, `COMISION GESTION CARTERA OF`, `IVA SOBRE COMISIONES` | `FEE` |
 | `LIQUIDAC. INTERESES` | `INTEREST` |
 | `CARGO RETENCION A CUENTA` | `TAX` |
 | `ABONO PROMOCION` | `CREDIT` (subtype `BONUS`) |
-| `TRANSFERENCIA SEPA`, `TRANSFERENCIA INMEDIATA`, `ABONO POR TRASPASO` | `DEPOSIT` |
-| `CARGO POR TRASPASO` | `WITHDRAWAL` |
+| `TRANSFERENCIA SEPA`, `TRANSFERENCIA INMEDIATA`, `ABONO POR TRASPASO`, `BIZUM RECIBIDO` | `DEPOSIT` |
+| `CARGO POR TRASPASO`, `TRANSF INMEDIATA EMITIDA`, `BIZUM ENVIADO`, `COMPRA COMERCIO O/L` (card purchase) | `WITHDRAWAL` |
 | `APERTURA` | Skipped (account-opening marker, zero amount) |
 
 ## Avoiding duplicates with other addons/accounts

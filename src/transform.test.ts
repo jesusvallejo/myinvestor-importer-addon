@@ -302,6 +302,17 @@ describe("Inversis movimientos labels", () => {
     expect(activities[0].symbol).toBe("MICRON TECHNOLOGY");
   });
 
+  it("skips a positive ABONO DE DIVIDENDO whose concept has no parseable instrument/quantity", () => {
+    const { activities, skipped } = transform(
+      [],
+      [movRow({ tipo: "ABONO DE DIVIDENDO", concepto: "DIVIDENDO CUENTA", importe: "+0,98" })],
+      CONFIG,
+    );
+    expect(activities).toHaveLength(0);
+    expect(skipped).toHaveLength(1);
+    expect(skipped[0].reason).toMatch(/could not extract instrument name\/quantity/i);
+  });
+
   it("maps negative ABONO DE DIVIDENDO (anulacion) to WITHDRAWAL to keep cash balance exact", () => {
     const { activities } = transform(
       [],
