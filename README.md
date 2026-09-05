@@ -53,7 +53,7 @@ a smaller/less accurate picture — see below.
 | `COMPRA RF VCTO` (movimientos) | `BUY` bond |
 | `AMORTIZACION RF` (movimientos) | `SELL` bond |
 | `ABONO DE DIVIDENDO` positive | `DIVIDEND` (skipped for review if the concept has no `<instrument> @ <quantity>` to identify the security) |
-| `ABONO DE DIVIDENDO` negative (e.g. `ANUL.` reversal line) | `WITHDRAWAL` (cash correction) |
+| `ABONO DE DIVIDENDO` negative (e.g. `ANUL.` reversal line) | `FEE` (subtype `REVERSAL`) — a real cash outflow like `WITHDRAWAL`, but doesn't inflate `net_contribution` |
 | `COMISION CUSTODIA MYINVESTOR`, `COMISIONES CUSTODIA`, `COMISION GESTION CARTERA OF`, `IVA SOBRE COMISIONES` | `FEE` |
 | `LIQUIDAC. INTERESES` | `INTEREST` |
 | `CARGO RETENCION A CUENTA` | `TAX` |
