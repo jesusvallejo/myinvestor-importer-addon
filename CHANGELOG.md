@@ -21,6 +21,7 @@
 ### Changed
 
 - Added parser coverage for mojibake header variants such as `Tipo de operación`.
+- Updated dependencies: `@vitejs/plugin-react` 6.1.0 → 6.1.1, `happy-dom` 20.11.6 → 20.11.15
 
 ## [1.0.2] - 2026-08-24
 
