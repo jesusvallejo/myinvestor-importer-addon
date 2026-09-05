@@ -9,7 +9,7 @@
 	- `VENTA DE VALORES` -> `SELL`
 	- `COMPRA RF VCTO` -> `BUY` (`BOND`, e.g. Letras del Tesoro)
 	- `AMORTIZACION RF` -> `SELL` (`BOND`)
-	- `ABONO DE DIVIDENDO` -> `DIVIDEND` for positive amounts, and `WITHDRAWAL` for negative reversal lines (e.g. `ANUL.`) to keep cash reconciliation exact.
+	- `ABONO DE DIVIDENDO` -> `DIVIDEND` for positive amounts, and `FEE` (subtype `REVERSAL`) for negative reversal lines (e.g. `ANUL.`) — a real cash outflow like `WITHDRAWAL`, but (unlike `WITHDRAWAL`) doesn't inflate `net_contribution`, matching how the original dividend credit never affected it either.
 	- `COMISIONES CUSTODIA` (alternate custody-fee label) -> `FEE`
 - Added support for personal current-account movimientos rows found in real exports:
 	- `BIZUM ENVIADO` -> `WITHDRAWAL`, `BIZUM RECIBIDO` -> `DEPOSIT`

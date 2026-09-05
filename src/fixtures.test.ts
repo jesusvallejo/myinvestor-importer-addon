@@ -155,7 +155,9 @@ describe("real-export fixtures", () => {
 
       const dividend = activities.find((a) => a.activityType === "DIVIDEND");
       expect(dividend?.symbol).toBe("SAMPLE SEMI INC");
-      expect(byComment("ANUL. SAMPLE SEMI INC")?.activityType).toBe("WITHDRAWAL");
+      const dividendReversal = byComment("ANUL. SAMPLE SEMI INC");
+      expect(dividendReversal?.activityType).toBe("FEE");
+      expect(dividendReversal?.subtype).toBe("REVERSAL");
 
       expect(byComment("Sample Cena Amigos")?.activityType).toBe("WITHDRAWAL");
       expect(byComment("Sin concepto")?.activityType).toBe("DEPOSIT");

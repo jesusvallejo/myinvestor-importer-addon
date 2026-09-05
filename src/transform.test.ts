@@ -313,14 +313,15 @@ describe("Inversis movimientos labels", () => {
     expect(skipped[0].reason).toMatch(/could not extract instrument name\/quantity/i);
   });
 
-  it("maps negative ABONO DE DIVIDENDO (anulacion) to WITHDRAWAL to keep cash balance exact", () => {
+  it("maps negative ABONO DE DIVIDENDO (anulacion) to FEE/REVERSAL to keep cash exact without inflating net_contribution", () => {
     const { activities } = transform(
       [],
       [movRow({ tipo: "ABONO DE DIVIDENDO", concepto: "ANUL. NOVO NORD BR/RG-B @ 32", importe: "-14,51" })],
       CONFIG,
     );
     expect(activities).toHaveLength(1);
-    expect(activities[0].activityType).toBe("WITHDRAWAL");
+    expect(activities[0].activityType).toBe("FEE");
+    expect(activities[0].subtype).toBe("REVERSAL");
   });
 });
 

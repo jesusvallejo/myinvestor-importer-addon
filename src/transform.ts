@@ -342,9 +342,21 @@ export function transform(
       } else {
         // Some Inversis exports carry dividend correction/reversal entries
         // as negative "ABONO DE DIVIDENDO" rows (often prefixed with
-        // "ANUL."). Model them as cash outflows so account cash stays
-        // exact while preserving the raw descriptor for user review.
-        drafts.push(cashAct(accountId, "WITHDRAWAL", r.fechaOperacion, orderHint, absAmt, r.concepto || r.tipo));
+        // "ANUL."). WITHDRAWAL would book the right cash outflow but
+        // unconditionally inflates net_contribution (handle_withdrawal in
+        // Wealthfolio's holdings calculator has no subtype escape, unlike
+        // CREDIT) — wrongly counting a dividend clawback as money the user
+        // personally pulled out. FEE is also a hardcoded cash outflow
+        // (economic_events.rs's type_directed_cash_effect) but is
+        // unconditionally excluded from net_contribution ("Charges do NOT
+        // affect net_contribution", cash_flows.rs), matching how the
+        // original DIVIDEND credit never touched it either. CREDIT (with a
+        // REFUND/REBATE subtype) can't be used instead — it's hardcoded as
+        // a cash inflow only, same bucket as DIVIDEND/INTEREST, so it can
+        // never represent this outflow.
+        drafts.push(
+          cashAct(accountId, "FEE", r.fechaOperacion, orderHint, absAmt, r.concepto || r.tipo, "REVERSAL"),
+        );
       }
       continue;
     }
