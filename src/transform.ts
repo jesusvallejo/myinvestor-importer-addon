@@ -86,12 +86,7 @@ function conceptInstrument(concepto: string): { symbol: string; quantity?: numbe
     .slice(0, at)
     .trim()
     .replace(/\s+/g, " ");
-  const quantityRaw = concepto
-    .slice(at + 1)
-    .trim()
-    .replace(/\./g, "")
-    .replace(",", ".");
-  const quantity = parseFloat(quantityRaw);
+  const quantity = movimientosNum(concepto.slice(at + 1).trim());
   return {
     symbol: symbol || "UNKNOWN",
     quantity: Number.isNaN(quantity) ? undefined : quantity,
@@ -332,7 +327,7 @@ export function transform(
           orderHint,
           activity: {
             accountId,
-            activityType: "DIVIDEND" as ActivityImport["activityType"],
+            activityType: "DIVIDEND",
             symbol,
             symbolName: symbol,
             instrumentType: "STOCK",
@@ -416,8 +411,11 @@ export function transform(
       // whichever addon manages the source account (e.g.
       // trade-republic-importer-addon's Transfer Patterns) — importing it
       // again here as a DEPOSIT would double-count the same money as both
-      // spending on that side and external income on this side.
-      if (amt >= 0) {
+      // spending on that side and external income on this side. Deliberately
+      // scoped to just SEPA/INMEDIATA, not TRANSF INMEDIATA EMITIDA (an
+      // outgoing transfer, which shouldn't be matched against a TRANSFER_IN
+      // even in the unusual case of a non-negative amount, e.g. a reversal).
+      if (amt >= 0 && r.tipo !== "TRANSF INMEDIATA EMITIDA") {
         const transferIn = findAmountDateMatch(existingCashTransfersIn, r.fechaOperacion, absAmt);
         if (transferIn) {
           // The addons' import order isn't controlled by either one: if this
